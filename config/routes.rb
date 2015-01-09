@@ -1,5 +1,12 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: { sessions: 'sessions' }
+  devise_for :users, skip: :all
+  devise_scope :user do
+    namespace :api do
+      namespace :v1 do
+        resources :sessions, only: :create
+      end
+    end
+  end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
