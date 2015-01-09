@@ -1,16 +1,8 @@
 class Api::V1::SessionsController < Devise::SessionsController
   def create
-    respond_to do |format|
-      format.html { super }
-      format.json do
-        self.resource = warden.authenticate!(auth_options)
-        sign_in(resource_name, resource)
-        data = {
-          user_token: self.resource.authentication_token,
-          user_email: self.resource.email
-        }
-        render json: data, status: 201
-      end
-    end
+    self.resource = warden.authenticate!(auth_options)
+    sign_in(resource_name, resource)
+    render json: self.resource, status: 201,
+           serializer: ResourceV1Serializer, root: false
   end
 end
