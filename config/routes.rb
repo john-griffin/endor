@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       namespace :v1 do
         resources :sessions, only: :create
         resources :crawls, only: :show
+        resources :stops, only: :index
       end
     end
   end
