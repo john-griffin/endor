@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     namespace :api, format: false do
       namespace :v1 do
         resources :sessions, only: :create
+        resources :crawls, only: :show
       end
     end
   end
