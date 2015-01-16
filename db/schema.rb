@@ -59,7 +59,7 @@ ActiveRecord::Schema.define(version: 20150116160625) do
     t.text     "description"
     t.string   "photo_url"
     t.text     "location",                   array: true
-    t.integer  "foursquare_id", null: false
+    t.string   "foursquare_id", null: false
   end
 
   add_index "venues", ["foursquare_id"], name: "index_venues_on_foursquare_id", using: :btree
