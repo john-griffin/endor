@@ -1,12 +1,11 @@
 class Api::V1::StopsController < ApplicationController
   def index
-    @stops = Stop.all.includes(:venue)
-
     if params[:crawl_id]
-      @stops = @stops.where(crawl_id: params[:crawl_id])
+      @stops = Stop.where(crawl_id: params[:crawl_id]).includes(:venue)
+      render json: @stops, each_serializer: StopV1Serializer
+    else
+      head :unprocessable_entity, "content_type" => 'text/plain'
     end
-
-    render json: @stops, each_serializer: StopV1Serializer
   end
 
   def create
