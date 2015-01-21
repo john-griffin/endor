@@ -2,8 +2,8 @@ class Api::V1::StopsController < ApplicationController
   def index
     if params[:crawl_id]
       @stops = Stop.where(crawl_id: params[:crawl_id])
-                   .rank(:row_order)
-                   .includes(:venue)
+               .rank(:row_order)
+               .includes(:venue)
       render json: @stops, each_serializer: StopV1Serializer
     else
       head :unprocessable_entity, "content_type" => 'text/plain'
@@ -54,6 +54,6 @@ class Api::V1::StopsController < ApplicationController
 
   def reqest_params
     params.require(:stop).permit(:crawl_id, :name, :row_order_position,
-      :description, :venue_name, :photo_url, :foursquare_id, location: [])
+                                 :description, :venue_name, :photo_url, :foursquare_id, location: [])
   end
 end

@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe "Crawls API", :type => :request do
+RSpec.describe Api::V1::CrawlsController do
   it "returns a crawl" do
     crawl = Crawl.create!(name: 'my crawl')
     get "/api/v1/crawls/#{crawl.id}"
     response_data = JSON.parse(response.body)
-    expect(response_data).to eq({
+    expect(response_data).to eq(
       'crawl' => {
         'id' => crawl.id,
         'name' => 'my crawl',
@@ -13,7 +13,7 @@ RSpec.describe "Crawls API", :type => :request do
           'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
         }
       }
-    })
+    )
   end
 
   it "crawl does not exist" do
