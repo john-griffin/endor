@@ -56,14 +56,27 @@ RSpec.describe Api::V1::StopsController do
     expect(response_data).to eq('stops' => [])
   end
 
+  def expected_stop(stop)
+    { 'stop' => {
+      'id' => stop.id,
+      'row_order' => stop.row_order,
+      'name' => 'foo',
+      'venue_name' => 'B.B. King Blues Club & Grill',
+      'description' => "B.B. King's Blues Club & Grill is the premier",
+      'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
+      'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
+      'foursquare_id' => '410c3280f964a520b20b1fe3'
+    } }
+  end
+
   it 'given existing crawl, it creates a stop and venue' do
     crawl = Crawl.create!(name: 'my crawl')
     post '/api/v1/stops', 'stop' => {
       'name' => 'foo',
-      'description' => "B.B. King's Blues Club & Grill is the premier live music venue & restaurant in the heart of Times Square.",
+      'description' => "B.B. King's Blues Club & Grill is the premier",
       'foursquare_id' => '410c3280f964a520b20b1fe3',
       'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
-      'location' => ['237 W 42nd St (btwn 7th & 8th Ave)', 'New York, NY 10036', 'United States'],
+      'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'venue_name' => 'B.B. King Blues Club & Grill',
       'row_order' => nil, # ember app sends through nil row_order
       'row_order_position' => 'last',
@@ -71,16 +84,7 @@ RSpec.describe Api::V1::StopsController do
     }
     response_data = JSON.parse(response.body)
     stop = Stop.first
-    expect(response_data).to eq('stop' => {
-                                  'id' => stop.id,
-                                  'row_order' => stop.row_order,
-                                  'name' => 'foo',
-                                  'venue_name' => 'B.B. King Blues Club & Grill',
-                                  'description' => "B.B. King's Blues Club & Grill is the premier live music venue & restaurant in the heart of Times Square.",
-                                  'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
-                                  'location' => ['237 W 42nd St (btwn 7th & 8th Ave)', 'New York, NY 10036', 'United States'],
-                                  'foursquare_id' => '410c3280f964a520b20b1fe3'
-                                })
+    expect(response_data).to eq(expected_stop(stop))
     expect(stop.venue.name).to eq('B.B. King Blues Club & Grill')
   end
 
@@ -88,9 +92,9 @@ RSpec.describe Api::V1::StopsController do
     Venue.create!(
       name: 'B.B. King Blues Club & Grill',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
-      'location' => ['237 W 42nd St (btwn 7th & 8th Ave)', 'New York, NY 10036', 'United States'],
+      'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
-      'description' => "B.B. King's Blues Club & Grill is the premier live music venue & restaurant in the heart of Times Square."
+      'description' => "B.B. King's Blues Club & Grill is the premier"
     )
     crawl = Crawl.create!(name: 'my crawl')
     post '/api/v1/stops', 'stop' => {
@@ -98,7 +102,7 @@ RSpec.describe Api::V1::StopsController do
       'description' => 'this will be replaced by existing description',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
       'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
-      'location' => ['237 W 42nd St (btwn 7th & 8th Ave)', 'New York, NY 10036', 'United States'],
+      'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'venue_name' => 'B.B. King Blues Club & Grill',
       'row_order' => nil, # ember app sends through nil row_order
       'row_order_position' => 'last',
@@ -106,16 +110,7 @@ RSpec.describe Api::V1::StopsController do
     }
     response_data = JSON.parse(response.body)
     stop = Stop.first
-    expect(response_data).to eq('stop' => {
-                                  'id' => stop.id,
-                                  'row_order' => stop.row_order,
-                                  'name' => 'foo',
-                                  'venue_name' => 'B.B. King Blues Club & Grill',
-                                  'description' => "B.B. King's Blues Club & Grill is the premier live music venue & restaurant in the heart of Times Square.",
-                                  'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
-                                  'location' => ['237 W 42nd St (btwn 7th & 8th Ave)', 'New York, NY 10036', 'United States'],
-                                  'foursquare_id' => '410c3280f964a520b20b1fe3'
-                                })
+    expect(response_data).to eq(expected_stop(stop))
     expect(stop.venue.name).to eq('B.B. King Blues Club & Grill')
     expect(Venue.count).to eq(1)
   end

@@ -56,7 +56,8 @@ module Api
 
       def reqest_params
         params.require(:stop).permit(:crawl_id, :name, :row_order_position,
-                                     :description, :venue_name, :photo_url, :foursquare_id, location: [])
+                                     :description, :venue_name, :photo_url,
+                                     :foursquare_id, location: [])
       end
     end
   end

@@ -1,5 +1,6 @@
 class StopV1Serializer < ActiveModel::Serializer
-  attributes :id, :row_order, :name, :venue_name, :description, :photo_url, :location, :foursquare_id
+  attributes :id, :row_order, :name, :venue_name, :description, :photo_url,
+             :location, :foursquare_id
 
   def venue_name
     venue.name
