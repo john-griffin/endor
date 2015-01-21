@@ -9,7 +9,9 @@ class Api::V1::StopsController < ApplicationController
   end
 
   def create
-    venue = Venue.new(venue_params)
+    venue = Venue.find_or_initialize_by(venue_id_params) do |v|
+      v.assign_attributes(venue_params)
+    end
     @stop = Stop.new(stop_params.merge(venue: venue))
 
     if @stop.save
@@ -24,6 +26,10 @@ class Api::V1::StopsController < ApplicationController
 
   def stop_params
     reqest_params.slice(:crawl_id, :name)
+  end
+
+  def venue_id_params
+    venue_params.slice(:foursquare_id)
   end
 
   def venue_params
