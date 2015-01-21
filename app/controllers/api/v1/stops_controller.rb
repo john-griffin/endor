@@ -24,6 +24,17 @@ class Api::V1::StopsController < ApplicationController
     end
   end
 
+  def update
+    @stop = Stop.find(params[:id])
+
+    if @stop.update(stop_params)
+      render json: @stop, status: :ok, root: :stop,
+             serializer: StopV1Serializer, location: [:api, :v1, @stop]
+    else
+      render json: { errors: @stop.errors }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def stop_params
