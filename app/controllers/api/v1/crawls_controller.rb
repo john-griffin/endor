@@ -5,7 +5,7 @@ module Api
         @crawl = Crawl.find(params[:id])
         render json: @crawl, serializer: CrawlV1Serializer, root: :crawl
       rescue ActiveRecord::RecordNotFound
-        head 404, "content_type" => 'text/plain'
+        head 404, 'content_type' => 'text/plain'
       end
     end
   end

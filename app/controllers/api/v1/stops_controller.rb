@@ -8,7 +8,7 @@ module Api
                    .includes(:venue)
           render json: @stops, each_serializer: StopV1Serializer
         else
-          head :unprocessable_entity, "content_type" => 'text/plain'
+          head :unprocessable_entity, 'content_type' => 'text/plain'
         end
       end
 
