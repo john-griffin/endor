@@ -24,6 +24,7 @@ RSpec.describe "Stops API", :type => :request do
     expect(response_data).to eq({"stops"=>[
       {
         "id"=>stop1.id,
+        "row_order"=>stop1.row_order,
         "name"=>"stop 1",
         "venue_name"=>"venue1",
         "description"=>"desc 1",
@@ -33,6 +34,7 @@ RSpec.describe "Stops API", :type => :request do
       },
       {
         "id"=>stop2.id,
+        "row_order"=>stop2.row_order,
         "name"=>"stop 2",
         "venue_name"=>"venue2",
         "description"=>"desc 2",
@@ -63,12 +65,15 @@ RSpec.describe "Stops API", :type => :request do
       "photo_url"=>"https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg",
       "location"=>["237 W 42nd St (btwn 7th & 8th Ave)","New York, NY 10036","United States"],
       "venue_name"=>"B.B. King Blues Club & Grill",
+      "row_order"=>nil, # ember app sends through nil row_order
+      "row_order_position"=>"last",
       "crawl_id"=>crawl.id
     }}
     response_data = JSON.parse(response.body)
     stop = Stop.first
     expect(response_data).to eq({"stop"=>{
       "id"=>stop.id,
+      "row_order"=>stop.row_order,
       "name"=>"foo",
       "venue_name"=>"B.B. King Blues Club & Grill",
       "description"=>"B.B. King's Blues Club & Grill is the premier live music venue & restaurant in the heart of Times Square.",
@@ -95,12 +100,15 @@ RSpec.describe "Stops API", :type => :request do
       "photo_url"=>"https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg",
       "location"=>["237 W 42nd St (btwn 7th & 8th Ave)","New York, NY 10036","United States"],
       "venue_name"=>"B.B. King Blues Club & Grill",
+      "row_order"=>nil, # ember app sends through nil row_order
+      "row_order_position"=>"last",
       "crawl_id"=>crawl.id
     }}
     response_data = JSON.parse(response.body)
     stop = Stop.first
     expect(response_data).to eq({"stop"=>{
       "id"=>stop.id,
+      "row_order"=>stop.row_order,
       "name"=>"foo",
       "venue_name"=>"B.B. King Blues Club & Grill",
       "description"=>"B.B. King's Blues Club & Grill is the premier live music venue & restaurant in the heart of Times Square.",
