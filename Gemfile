@@ -35,7 +35,12 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'devise', '~> 3.4.1'
 gem 'active_model_serializers', '~> 0.8.3'
 gem 'ranked-model', '~> 0.4.0'
-gem 'simplecov', '~> 0.8.0', require: false, group: :test
+
+group :test do
+  gem 'simplecov', '~> 0.8.0', require: false
+  # use simplecov-html from git to fix safari issues (1ba6e43a6e0d9a2ce423e)
+  gem 'simplecov-html', github: 'colszowka/simplecov-html', require: false
+end
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
