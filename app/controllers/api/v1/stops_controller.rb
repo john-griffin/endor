@@ -27,9 +27,12 @@ module Api
       end
 
       def update
+        venue = Venue.find_or_initialize_by(venue_id_params) do |v|
+          v.assign_attributes(venue_params)
+        end
         @stop = Stop.find(params[:id])
 
-        if @stop.update(stop_params)
+        if @stop.update(stop_params.merge(venue: venue))
           render json: @stop, status: :ok, root: :stop,
                  serializer: StopV1Serializer, location: [:api, :v1, @stop]
         else

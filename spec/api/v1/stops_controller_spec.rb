@@ -1,48 +1,86 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::StopsController do
-  it 'returns stops and venues for a crawl' do
-    venue1 = Venue.create(
-      name: 'venue1',
-      description: 'desc 1',
-      photo_url: 'http://example.com/image1.png',
-      location: ['address1', 'address 2'],
-      foursquare_id: 'id1'
-    )
-    venue2 = Venue.create(
-      name: 'venue2',
-      description: 'desc 2',
-      photo_url: 'http://example.com/image2.png',
-      location: ['address3', 'address 4', 'address 5'],
-      foursquare_id: 'id2'
-    )
-    stop1 = Stop.new(name: 'stop 1', venue: venue1)
-    stop2 = Stop.new(name: 'stop 2', venue: venue2)
-    crawl = Crawl.create!(name: 'my crawl', stops: [stop1, stop2])
-    get '/api/v1/stops',  crawl_id: crawl.id
-    response_data = JSON.parse(response.body)
-    expect(response_data).to eq('stops' => [
-      {
-        'id' => stop1.id,
-        'row_order' => stop1.row_order,
-        'name' => 'stop 1',
+  context 'given some stops, venues and crawl' do
+    let(:stop1) do
+      venue1 = Venue.create(
+        name: 'venue1',
+        description: 'desc 1',
+        photo_url: 'http://example.com/image1.png',
+        location: ['address1', 'address 2'],
+        foursquare_id: 'id1'
+      )
+      Stop.new(name: 'stop 1', venue: venue1, row_order_position: 'last')
+    end
+    let(:stop2) do
+      venue2 = Venue.create(
+        name: 'venue2',
+        description: 'desc 2',
+        photo_url: 'http://example.com/image2.png',
+        location: ['address3', 'address 4', 'address 5'],
+        foursquare_id: 'id2'
+      )
+      Stop.new(name: 'stop 2', venue: venue2, row_order_position: 'last')
+    end
+    let!(:crawl) { Crawl.create!(name: 'my crawl', stops: [stop1, stop2]) }
+
+    it 'returns stops and venues for a crawl' do
+      get '/api/v1/stops',  crawl_id: crawl.id
+      response_data = JSON.parse(response.body)
+      expect(response_data).to eq('stops' => [
+        {
+          'id' => stop1.id,
+          'row_order' => stop1.row_order,
+          'name' => 'stop 1',
+          'venue_name' => 'venue1',
+          'description' => 'desc 1',
+          'photo_url' => 'http://example.com/image1.png',
+          'location' => ['address1', 'address 2'],
+          'foursquare_id' => 'id1'
+        },
+        {
+          'id' => stop2.id,
+          'row_order' => stop2.row_order,
+          'name' => 'stop 2',
+          'venue_name' => 'venue2',
+          'description' => 'desc 2',
+          'photo_url' => 'http://example.com/image2.png',
+          'location' => ['address3', 'address 4', 'address 5'],
+          'foursquare_id' => 'id2'
+        }
+      ])
+    end
+
+    it 'can update a stop and return updated details' do
+      expect(stop1.row_order).to be < stop2.row_order
+      put "/api/v1/stops/#{stop1.id}", stop: {
+        'name' => 'stop 1 updated',
         'venue_name' => 'venue1',
         'description' => 'desc 1',
         'photo_url' => 'http://example.com/image1.png',
         'location' => ['address1', 'address 2'],
-        'foursquare_id' => 'id1'
-      },
-      {
-        'id' => stop2.id,
-        'row_order' => stop2.row_order,
-        'name' => 'stop 2',
-        'venue_name' => 'venue2',
-        'description' => 'desc 2',
-        'photo_url' => 'http://example.com/image2.png',
-        'location' => ['address3', 'address 4', 'address 5'],
-        'foursquare_id' => 'id2'
+        'foursquare_id' => 'id47',
+        'row_order_position' => 'down'
       }
-    ])
+      expect(response).to have_http_status(200)
+      response_data = JSON.parse(response.body)
+      expect(response_data['stop']['name']).to eq('stop 1 updated')
+      expect(response_data['stop']['foursquare_id']).to eq('id47')
+      expect(response_data['stop']['row_order']).to be > stop2.row_order
+    end
+
+    it "can't set bad params" do
+      put "/api/v1/stops/#{stop1.id}", stop: {
+        'name' => 'stop 1 updated',
+        'venue_name' => 'venue1',
+        'description' => 'desc 1',
+        'photo_url' => 'http://example.com/image1.png',
+        'location' => ['address1', 'address 2'],
+        'foursquare_id' => nil,
+        'row_order_position' => 'blerg'
+      }
+      expect(response).to have_http_status(422)
+    end
   end
 
   it 'returns 422 if crawl id is missing' do
