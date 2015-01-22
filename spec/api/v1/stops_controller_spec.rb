@@ -6,21 +6,23 @@ RSpec.describe Api::V1::StopsController do
       venue1 = Venue.create(
         name: 'venue1',
         description: 'desc 1',
-        photo_url: 'http://example.com/image1.png',
         location: ['address1', 'address 2'],
         foursquare_id: 'id1'
       )
-      Stop.new(name: 'stop 1', venue: venue1, row_order_position: 'last')
+      Stop.new(name: 'stop 1', venue: venue1, row_order_position: 'last',
+               photo_prefix: 'http://example.com', photo_suffix: '1.png',
+               photo_id: 'p1')
     end
     let(:stop2) do
       venue2 = Venue.create(
         name: 'venue2',
         description: 'desc 2',
-        photo_url: 'http://example.com/image2.png',
         location: ['address3', 'address 4', 'address 5'],
         foursquare_id: 'id2'
       )
-      Stop.new(name: 'stop 2', venue: venue2, row_order_position: 'last')
+      Stop.new(name: 'stop 2', venue: venue2, row_order_position: 'last',
+               photo_prefix: 'http://example.com', photo_suffix: '2.png',
+               photo_id: 'p2')
     end
     let!(:crawl) { Crawl.create!(name: 'my crawl', stops: [stop1, stop2]) }
 
@@ -35,7 +37,9 @@ RSpec.describe Api::V1::StopsController do
           'name' => 'stop 1',
           'venue_name' => 'venue1',
           'description' => 'desc 1',
-          'photo_url' => 'http://example.com/image1.png',
+          'photo_id' => 'p1',
+          'photo_prefix' => 'http://example.com',
+          'photo_suffix' => '1.png',
           'location' => ['address1', 'address 2'],
           'foursquare_id' => 'id1'
         }
@@ -52,7 +56,9 @@ RSpec.describe Api::V1::StopsController do
           'name' => 'stop 1',
           'venue_name' => 'venue1',
           'description' => 'desc 1',
-          'photo_url' => 'http://example.com/image1.png',
+          'photo_id' => 'p1',
+          'photo_prefix' => 'http://example.com',
+          'photo_suffix' => '1.png',
           'location' => ['address1', 'address 2'],
           'foursquare_id' => 'id1'
         },
@@ -62,7 +68,9 @@ RSpec.describe Api::V1::StopsController do
           'name' => 'stop 2',
           'venue_name' => 'venue2',
           'description' => 'desc 2',
-          'photo_url' => 'http://example.com/image2.png',
+          'photo_id' => 'p2',
+          'photo_prefix' => 'http://example.com',
+          'photo_suffix' => '2.png',
           'location' => ['address3', 'address 4', 'address 5'],
           'foursquare_id' => 'id2'
         }
@@ -75,7 +83,6 @@ RSpec.describe Api::V1::StopsController do
         'name' => 'stop 1 updated',
         'venue_name' => 'venue1',
         'description' => 'desc 1',
-        'photo_url' => 'http://example.com/image1.png',
         'location' => ['address1', 'address 2'],
         'foursquare_id' => 'id47',
         'row_order_position' => 'down'
@@ -92,7 +99,6 @@ RSpec.describe Api::V1::StopsController do
         'name' => 'stop 1 updated',
         'venue_name' => 'venue1',
         'description' => 'desc 1',
-        'photo_url' => 'http://example.com/image1.png',
         'location' => ['address1', 'address 2'],
         'foursquare_id' => nil,
         'row_order_position' => 'blerg'
@@ -125,12 +131,12 @@ RSpec.describe Api::V1::StopsController do
 
   def expected_stop(stop)
     { 'stop' => {
-      'id' => stop.id,
-      'row_order' => stop.row_order,
-      'name' => 'foo',
+      'id' => stop.id, 'row_order' => stop.row_order, 'name' => 'foo',
       'venue_name' => 'B.B. King Blues Club & Grill',
       'description' => "B.B. King's Blues Club & Grill is the premier",
-      'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
+      'photo_id' => 'blarg',
+      'photo_prefix' => 'http://foo.com',
+      'photo_suffix' => 'blarg.jpg',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'foursquare_id' => '410c3280f964a520b20b1fe3'
     } }
@@ -141,8 +147,10 @@ RSpec.describe Api::V1::StopsController do
     post '/api/v1/stops', 'stop' => {
       'name' => 'foo',
       'description' => "B.B. King's Blues Club & Grill is the premier",
+      'photo_prefix' => 'http://foo.com',
+      'photo_suffix' => 'blarg.jpg',
+      'photo_id' => 'blarg',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
-      'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'venue_name' => 'B.B. King Blues Club & Grill',
       'row_order' => nil, # ember app sends through nil row_order
@@ -160,7 +168,6 @@ RSpec.describe Api::V1::StopsController do
       name: 'B.B. King Blues Club & Grill',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
-      'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
       'description' => "B.B. King's Blues Club & Grill is the premier"
     )
     crawl = Crawl.create!(name: 'my crawl')
@@ -168,9 +175,11 @@ RSpec.describe Api::V1::StopsController do
       'name' => 'foo',
       'description' => 'this will be replaced by existing description',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
-      'photo_url' => 'https://irs3.4sqi.net/img/general/width300/52909181_Mrpsi_KnrVUAI5tzdgesZ3SWasHfplIYmQnQNBFYU5k.jpg',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'venue_name' => 'B.B. King Blues Club & Grill',
+      'photo_prefix' => 'http://foo.com',
+      'photo_suffix' => 'blarg.jpg',
+      'photo_id' => 'blarg',
       'row_order' => nil, # ember app sends through nil row_order
       'row_order_position' => 'last',
       'crawl_id' => crawl.id

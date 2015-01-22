@@ -61,7 +61,8 @@ module Api
       end
 
       def stop_params
-        reqest_params.slice(:crawl_id, :name, :row_order_position)
+        reqest_params.slice(:crawl_id, :name, :row_order_position, :photo_id,
+                            :photo_prefix, :photo_suffix)
       end
 
       def venue_id_params
@@ -70,14 +71,15 @@ module Api
 
       def venue_params
         vp = reqest_params.slice(
-          :description, :venue_name, :photo_url, :foursquare_id, :location)
+          :description, :venue_name, :foursquare_id, :location)
         vp[:name] = vp.delete(:venue_name)
         vp
       end
 
       def reqest_params
         params.require(:stop).permit(:crawl_id, :name, :row_order_position,
-                                     :description, :venue_name, :photo_url,
+                                     :description, :venue_name, :photo_id,
+                                     :photo_prefix, :photo_suffix,
                                      :foursquare_id, location: [])
       end
     end

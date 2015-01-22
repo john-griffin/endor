@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150121141258) do
+ActiveRecord::Schema.define(version: 20150122223850) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,13 +25,17 @@ ActiveRecord::Schema.define(version: 20150121141258) do
   create_table "stops", force: :cascade do |t|
     t.string   "name"
     t.integer  "crawl_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
     t.integer  "venue_id"
     t.integer  "row_order"
+    t.string   "photo_prefix", null: false
+    t.string   "photo_suffix", null: false
+    t.string   "photo_id",     null: false
   end
 
   add_index "stops", ["crawl_id"], name: "index_stops_on_crawl_id", using: :btree
+  add_index "stops", ["photo_id"], name: "index_stops_on_photo_id", using: :btree
   add_index "stops", ["venue_id"], name: "index_stops_on_venue_id", using: :btree
 
   create_table "users", force: :cascade do |t|
@@ -58,7 +62,6 @@ ActiveRecord::Schema.define(version: 20150121141258) do
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
     t.text     "description"
-    t.string   "photo_url"
     t.text     "location",                   array: true
     t.string   "foursquare_id", null: false
   end
