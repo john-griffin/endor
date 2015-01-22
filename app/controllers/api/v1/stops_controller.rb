@@ -50,7 +50,7 @@ module Api
       private
 
       def set_stop
-        @stop = Stop.find(params[:id])
+        @stop = Stop.includes(:venue).find(params[:id])
       rescue ActiveRecord::RecordNotFound
         head 404, 'content_type' => 'text/plain'
       end
