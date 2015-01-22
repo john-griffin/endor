@@ -1,6 +1,8 @@
 module Api
   module V1
     class StopsController < ApplicationController
+      before_filter :set_stop, only: [:update, :destroy]
+
       def index
         if params[:crawl_id]
           @stops = Stop.where(crawl_id: params[:crawl_id])
@@ -30,7 +32,6 @@ module Api
         venue = Venue.find_or_initialize_by(venue_id_params) do |v|
           v.assign_attributes(venue_params)
         end
-        @stop = Stop.find(params[:id])
 
         if @stop.update(stop_params.merge(venue: venue))
           render json: @stop, status: :ok, root: :stop,
@@ -40,7 +41,19 @@ module Api
         end
       end
 
+      def destroy
+        @stop.destroy
+
+        head :no_content
+      end
+
       private
+
+      def set_stop
+        @stop = Stop.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        head 404, 'content_type' => 'text/plain'
+      end
 
       def stop_params
         reqest_params.slice(:crawl_id, :name, :row_order_position)

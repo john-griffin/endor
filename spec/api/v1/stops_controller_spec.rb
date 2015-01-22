@@ -81,6 +81,17 @@ RSpec.describe Api::V1::StopsController do
       }
       expect(response).to have_http_status(422)
     end
+
+    it "can delete a stop" do
+      delete "/api/v1/stops/#{stop1.id}"
+      expect(Stop.where(id: stop1.id)).to be_empty
+      expect(response).to have_http_status(204)
+    end
+
+    it "can't delete a stop that doesn't exist" do
+      delete "/api/v1/stops/47"
+      expect(response).to have_http_status(404)
+    end
   end
 
   it 'returns 422 if crawl id is missing' do

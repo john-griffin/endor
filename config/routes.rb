@@ -5,7 +5,7 @@ Rails.application.routes.draw do
       namespace :v1 do
         resources :sessions, only: :create
         resources :crawls, only: :show
-        resources :stops, except: [:new, :edit, :destroy]
+        resources :stops, except: [:new, :edit]
       end
     end
   end
