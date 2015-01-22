@@ -24,6 +24,24 @@ RSpec.describe Api::V1::StopsController do
     end
     let!(:crawl) { Crawl.create!(name: 'my crawl', stops: [stop1, stop2]) }
 
+    it 'can fetch a single stop' do
+      get "/api/v1/stops/#{stop1.id}"
+      expect(response).to have_http_status(200)
+      response_data = JSON.parse(response.body)
+      expect(response_data).to eq(
+        'stop' => {
+          'id' => stop1.id,
+          'row_order' => stop1.row_order,
+          'name' => 'stop 1',
+          'venue_name' => 'venue1',
+          'description' => 'desc 1',
+          'photo_url' => 'http://example.com/image1.png',
+          'location' => ['address1', 'address 2'],
+          'foursquare_id' => 'id1'
+        }
+      )
+    end
+
     it 'returns stops and venues for a crawl' do
       get '/api/v1/stops',  crawl_id: crawl.id
       response_data = JSON.parse(response.body)

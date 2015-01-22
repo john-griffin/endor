@@ -1,7 +1,7 @@
 module Api
   module V1
     class StopsController < ApplicationController
-      before_filter :set_stop, only: [:update, :destroy]
+      before_filter :set_stop, only: [:update, :destroy, :show]
 
       def index
         if params[:crawl_id]
@@ -45,6 +45,11 @@ module Api
         @stop.destroy
 
         head :no_content
+      end
+
+      def show
+        render json: @stop, status: :ok, root: :stop,
+               serializer: StopV1Serializer, location: [:api, :v1, @stop]
       end
 
       private
