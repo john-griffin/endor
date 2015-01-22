@@ -16,8 +16,8 @@ RSpec.describe Api::V1::StopsController do
       location: ['address3', 'address 4', 'address 5'],
       foursquare_id: 'id2'
     )
-    stop1 = Stop.create!(name: 'stop 1', venue: venue1)
-    stop2 = Stop.create!(name: 'stop 2', venue: venue2)
+    stop1 = Stop.new(name: 'stop 1', venue: venue1)
+    stop2 = Stop.new(name: 'stop 2', venue: venue2)
     crawl = Crawl.create!(name: 'my crawl', stops: [stop1, stop2])
     get '/api/v1/stops',  crawl_id: crawl.id
     response_data = JSON.parse(response.body)
@@ -113,5 +113,23 @@ RSpec.describe Api::V1::StopsController do
     expect(response_data).to eq(expected_stop(stop))
     expect(stop.venue.name).to eq('B.B. King Blues Club & Grill')
     expect(Venue.count).to eq(1)
+  end
+
+  it 'cannot create a stop without a crawl' do
+    post '/api/v1/stops', 'stop' => {
+      'name' => 'foo',
+      'description' => 'this will be replaced by existing description'
+    }
+    expect(response).to have_http_status(422)
+  end
+
+  it 'cannot create a stop without a venue' do
+    crawl = Crawl.create!(name: 'my crawl')
+    post '/api/v1/stops', 'stop' => {
+      'name' => 'foo',
+      'description' => 'this will be replaced by existing description',
+      'crawl_id' => crawl.id
+    }
+    expect(response).to have_http_status(422)
   end
 end

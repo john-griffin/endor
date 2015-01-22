@@ -4,4 +4,8 @@ class Stop < ActiveRecord::Base
 
   belongs_to :crawl
   belongs_to :venue
+
+  validates_associated :venue
+  validates :crawl, presence: true
+  validates :venue, presence: true
 end
