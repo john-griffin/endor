@@ -33,6 +33,7 @@ RSpec.describe Api::V1::StopsController do
       expect(response_data).to eq(
         'stop' => {
           'id' => stop1.id,
+          'crawl_id' => crawl.id,
           'row_order' => stop1.row_order,
           'name' => 'stop 1',
           'venue_name' => 'venue1',
@@ -52,6 +53,7 @@ RSpec.describe Api::V1::StopsController do
       expect(response_data).to eq('stops' => [
         {
           'id' => stop1.id,
+          'crawl_id' => crawl.id,
           'row_order' => stop1.row_order,
           'name' => 'stop 1',
           'venue_name' => 'venue1',
@@ -64,6 +66,7 @@ RSpec.describe Api::V1::StopsController do
         },
         {
           'id' => stop2.id,
+          'crawl_id' => crawl.id,
           'row_order' => stop2.row_order,
           'name' => 'stop 2',
           'venue_name' => 'venue2',
@@ -132,10 +135,10 @@ RSpec.describe Api::V1::StopsController do
   def expected_stop(stop)
     { 'stop' => {
       'id' => stop.id, 'row_order' => stop.row_order, 'name' => 'foo',
+      'crawl_id' => stop.crawl_id,
       'venue_name' => 'B.B. King Blues Club & Grill',
       'description' => "B.B. King's Blues Club & Grill is the premier",
-      'photo_id' => 'blarg',
-      'photo_prefix' => 'http://foo.com',
+      'photo_id' => 'blarg', 'photo_prefix' => 'http://foo.com',
       'photo_suffix' => 'blarg.jpg',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'foursquare_id' => '410c3280f964a520b20b1fe3'
