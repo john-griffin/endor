@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::StopsController do
+  let!(:user) do
+    User.create!(email: 'u@u.com', password: 'something')
+  end
+
   context 'given some stops, venues and crawl' do
     let(:stop1) do
       venue1 = Venue.create(
@@ -24,7 +28,9 @@ RSpec.describe Api::V1::StopsController do
                photo_prefix: 'http://example.com', photo_suffix: '2.png',
                photo_id: 'p2')
     end
-    let!(:crawl) { Crawl.create!(name: 'my crawl', stops: [stop1, stop2]) }
+    let!(:crawl) do
+      Crawl.create!(name: 'my crawl', stops: [stop1, stop2], user: user)
+    end
 
     it 'can fetch a single stop' do
       get "/api/v1/stops/#{stop1.id}"
@@ -146,7 +152,7 @@ RSpec.describe Api::V1::StopsController do
   end
 
   it 'given existing crawl, it creates a stop and venue' do
-    crawl = Crawl.create!(name: 'my crawl')
+    crawl = Crawl.create!(name: 'my crawl', user: user)
     post '/api/v1/stops', 'stop' => {
       'name' => 'foo',
       'description' => "B.B. King's Blues Club & Grill is the premier",
@@ -173,7 +179,7 @@ RSpec.describe Api::V1::StopsController do
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'description' => "B.B. King's Blues Club & Grill is the premier"
     )
-    crawl = Crawl.create!(name: 'my crawl')
+    crawl = Crawl.create!(name: 'my crawl', user: user)
     post '/api/v1/stops', 'stop' => {
       'name' => 'foo',
       'description' => 'this will be replaced by existing description',
@@ -203,7 +209,7 @@ RSpec.describe Api::V1::StopsController do
   end
 
   it 'cannot create a stop without a venue' do
-    crawl = Crawl.create!(name: 'my crawl')
+    crawl = Crawl.create!(name: 'my crawl', user: user)
     post '/api/v1/stops', 'stop' => {
       'name' => 'foo',
       'description' => 'this will be replaced by existing description',
