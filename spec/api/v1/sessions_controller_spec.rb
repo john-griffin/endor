@@ -11,4 +11,11 @@ RSpec.describe Api::V1::SessionsController do
     expect(response_data).to eq(
       'authentication_token' => u.authentication_token, 'email' => 'u@u.com')
   end
+
+  it 'can be rejected' do
+    post '/api/v1/sessions', 'user' => {
+      'email' => 'u@u.com', 'password' => 'something'
+    }
+    expect(response).to have_http_status(401)
+  end
 end
