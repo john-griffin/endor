@@ -6,6 +6,10 @@ RSpec.describe Api::V1::StopsController do
   end
 
   let(:auth_header) do
+    generate_token(user)
+  end
+
+  def generate_token(user)
     {
       authorization: ActionController::HttpAuthentication::Token
         .encode_credentials(user.authentication_token, email: user.email)
