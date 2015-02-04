@@ -3,6 +3,7 @@ module Api
     class StopsController < ApplicationController
       before_action :authenticate_user!, only: [:create, :update, :destroy]
       before_action :set_stop, only: [:update, :destroy, :show]
+      before_action :check_owner, only: [:update, :destroy]
 
       def index
         if params[:crawl_id]
@@ -19,6 +20,8 @@ module Api
         venue = Venue.find_or_initialize_by(venue_id_params) do |v|
           v.assign_attributes(venue_params)
         end
+        crawl = Crawl.find(stop_params[:crawl_id])
+        current_user?(crawl.user.id)
         @stop = Stop.new(stop_params.merge(venue: venue))
 
         if @stop.save
@@ -27,6 +30,8 @@ module Api
         else
           render json: { errors: @stop.errors }, status: :unprocessable_entity
         end
+      rescue ActiveRecord::RecordNotFound
+        head 422, 'content_type' => 'text/plain'
       end
 
       def update
@@ -55,8 +60,18 @@ module Api
 
       private
 
+      def check_owner
+        current_user?(@stop.user.id)
+      end
+
+      def current_user?(user_id)
+        if current_user.id != user_id
+          head :unauthorized
+        end
+      end
+
       def set_stop
-        @stop = Stop.includes(:venue).find(params[:id])
+        @stop = Stop.includes(:venue, crawl: [:user]).find(params[:id])
       rescue ActiveRecord::RecordNotFound
         head 404, 'content_type' => 'text/plain'
       end

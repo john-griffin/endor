@@ -132,6 +132,12 @@ RSpec.describe Api::V1::StopsController do
       expect(Stop.where(id: stop1.id)).to be_empty
     end
 
+    it 'can not delete a stop owner by another user' do
+      user2 = User.create!(email: 'b@b.com', password: 'somethingelse')
+      delete "/api/v1/stops/#{stop1.id}", {}, generate_token(user2)
+      expect(response).to have_http_status(401)
+    end
+
     it "can't delete a stop that doesn't exist" do
       delete '/api/v1/stops/47', {}, auth_header
       expect(response).to have_http_status(404)
