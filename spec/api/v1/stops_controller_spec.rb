@@ -5,6 +5,13 @@ RSpec.describe Api::V1::StopsController do
     User.create!(email: 'u@u.com', password: 'something')
   end
 
+  let(:auth_header) do
+    {
+      authorization: ActionController::HttpAuthentication::Token
+        .encode_credentials(user.authentication_token, email: user.email)
+    }
+  end
+
   context 'given some stops, venues and crawl' do
     let(:stop1) do
       venue1 = Venue.create(
@@ -88,14 +95,14 @@ RSpec.describe Api::V1::StopsController do
 
     it 'can update a stop and return updated details' do
       expect(stop1.row_order).to be < stop2.row_order
-      put "/api/v1/stops/#{stop1.id}", stop: {
+      put "/api/v1/stops/#{stop1.id}", { stop: {
         'name' => 'stop 1 updated',
         'venue_name' => 'venue1',
         'description' => 'desc 1',
         'location' => ['address1', 'address 2'],
         'foursquare_id' => 'id47',
         'row_order_position' => 'down'
-      }
+      } }, auth_header
       expect(response).to have_http_status(200)
       response_data = JSON.parse(response.body)
       expect(response_data['stop']['name']).to eq('stop 1 updated')
@@ -104,25 +111,25 @@ RSpec.describe Api::V1::StopsController do
     end
 
     it "can't set bad params" do
-      put "/api/v1/stops/#{stop1.id}", stop: {
+      put "/api/v1/stops/#{stop1.id}", { stop: {
         'name' => 'stop 1 updated',
         'venue_name' => 'venue1',
         'description' => 'desc 1',
         'location' => ['address1', 'address 2'],
         'foursquare_id' => nil,
         'row_order_position' => 'blerg'
-      }
+      } }, auth_header
       expect(response).to have_http_status(422)
     end
 
     it 'can delete a stop' do
-      delete "/api/v1/stops/#{stop1.id}"
+      delete "/api/v1/stops/#{stop1.id}", {}, auth_header
       expect(response).to have_http_status(204)
       expect(Stop.where(id: stop1.id)).to be_empty
     end
 
     it "can't delete a stop that doesn't exist" do
-      delete '/api/v1/stops/47'
+      delete '/api/v1/stops/47', {}, auth_header
       expect(response).to have_http_status(404)
     end
   end
@@ -153,7 +160,7 @@ RSpec.describe Api::V1::StopsController do
 
   it 'given existing crawl, it creates a stop and venue' do
     crawl = Crawl.create!(name: 'my crawl', user: user)
-    post '/api/v1/stops', 'stop' => {
+    post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
       'description' => "B.B. King's Blues Club & Grill is the premier",
       'photo_prefix' => 'http://foo.com',
@@ -165,7 +172,7 @@ RSpec.describe Api::V1::StopsController do
       'row_order' => nil, # ember app sends through nil row_order
       'row_order_position' => 'last',
       'crawl_id' => crawl.id
-    }
+    } }, auth_header
     expect(response).to have_http_status(201)
     response_data = JSON.parse(response.body)
     stop = Stop.first
@@ -181,7 +188,7 @@ RSpec.describe Api::V1::StopsController do
       'description' => "B.B. King's Blues Club & Grill is the premier"
     )
     crawl = Crawl.create!(name: 'my crawl', user: user)
-    post '/api/v1/stops', 'stop' => {
+    post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
       'description' => 'this will be replaced by existing description',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
@@ -193,7 +200,7 @@ RSpec.describe Api::V1::StopsController do
       'row_order' => nil, # ember app sends through nil row_order
       'row_order_position' => 'last',
       'crawl_id' => crawl.id
-    }
+    } }, auth_header
     expect(response).to have_http_status(201)
     response_data = JSON.parse(response.body)
     stop = Stop.first
@@ -203,20 +210,20 @@ RSpec.describe Api::V1::StopsController do
   end
 
   it 'cannot create a stop without a crawl' do
-    post '/api/v1/stops', 'stop' => {
+    post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
       'description' => 'this will be replaced by existing description'
-    }
+    } }, auth_header
     expect(response).to have_http_status(422)
   end
 
   it 'cannot create a stop without a venue' do
     crawl = Crawl.create!(name: 'my crawl', user: user)
-    post '/api/v1/stops', 'stop' => {
+    post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
       'description' => 'this will be replaced by existing description',
       'crawl_id' => crawl.id
-    }
+    } }, auth_header
     expect(response).to have_http_status(422)
   end
 end
