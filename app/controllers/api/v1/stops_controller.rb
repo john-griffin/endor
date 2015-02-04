@@ -1,8 +1,8 @@
 module Api
   module V1
     class StopsController < ApplicationController
-      before_filter :authenticate_user!, only: [:create, :update, :destroy]
-      before_filter :set_stop, only: [:update, :destroy, :show]
+      before_action :authenticate_user!, only: [:create, :update, :destroy]
+      before_action :set_stop, only: [:update, :destroy, :show]
 
       def index
         if params[:crawl_id]
