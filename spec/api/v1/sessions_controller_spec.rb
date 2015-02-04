@@ -9,7 +9,7 @@ RSpec.describe Api::V1::SessionsController do
     expect(response).to have_http_status(201)
     response_data = JSON.parse(response.body)
     expect(response_data).to eq(
-      'authentication_token' => u.authentication_token,
+      'token' => u.authentication_token,
       'email' => 'u@u.com',
       'id' => u.id
     )

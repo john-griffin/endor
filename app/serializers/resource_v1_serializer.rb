@@ -1,3 +1,7 @@
 class ResourceV1Serializer < ActiveModel::Serializer
-  attributes :authentication_token, :email, :id
+  attributes :token, :email, :id
+
+  def token
+    object.authentication_token
+  end
 end
