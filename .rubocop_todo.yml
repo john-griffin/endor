@@ -18,7 +18,6 @@ AllCops:
     - 'script/**/*'
     - 'bin/**/*'
     - 'spec/spec_helper.rb'
-    - 'spec/rails_helper.rb'
     - !ruby/regexp /old_and_unused\.rb$/
 
 # Offense count: 1
