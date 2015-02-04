@@ -117,8 +117,8 @@ RSpec.describe Api::V1::StopsController do
 
     it 'can delete a stop' do
       delete "/api/v1/stops/#{stop1.id}"
-      expect(Stop.where(id: stop1.id)).to be_empty
       expect(response).to have_http_status(204)
+      expect(Stop.where(id: stop1.id)).to be_empty
     end
 
     it "can't delete a stop that doesn't exist" do
@@ -166,6 +166,7 @@ RSpec.describe Api::V1::StopsController do
       'row_order_position' => 'last',
       'crawl_id' => crawl.id
     }
+    expect(response).to have_http_status(201)
     response_data = JSON.parse(response.body)
     stop = Stop.first
     expect(response_data).to eq(expected_stop(stop))
@@ -193,6 +194,7 @@ RSpec.describe Api::V1::StopsController do
       'row_order_position' => 'last',
       'crawl_id' => crawl.id
     }
+    expect(response).to have_http_status(201)
     response_data = JSON.parse(response.body)
     stop = Stop.first
     expect(response_data).to eq(expected_stop(stop))
