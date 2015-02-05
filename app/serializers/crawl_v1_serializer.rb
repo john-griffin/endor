@@ -1,5 +1,5 @@
 class CrawlV1Serializer < ActiveModel::Serializer
-  attributes :id, :name, :user_id, :links
+  attributes :id, :name, :city, :user_id, :links
 
   def links
     {

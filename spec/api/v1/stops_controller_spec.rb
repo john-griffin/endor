@@ -40,7 +40,8 @@ RSpec.describe Api::V1::StopsController do
                photo_id: 'p2')
     end
     let!(:crawl) do
-      Crawl.create!(name: 'my crawl', stops: [stop1, stop2], user: user)
+      Crawl.create!(
+        name: 'my crawl', stops: [stop1, stop2], user: user, city: 'London')
     end
 
     it 'can fetch a single stop' do
@@ -169,7 +170,7 @@ RSpec.describe Api::V1::StopsController do
   end
 
   it 'given existing crawl, it creates a stop and venue' do
-    crawl = Crawl.create!(name: 'my crawl', user: user)
+    crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')
     post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
       'description' => "B.B. King's Blues Club & Grill is the premier",
@@ -197,7 +198,7 @@ RSpec.describe Api::V1::StopsController do
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'description' => "B.B. King's Blues Club & Grill is the premier"
     )
-    crawl = Crawl.create!(name: 'my crawl', user: user)
+    crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')
     post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
       'description' => 'this will be replaced by existing description',
@@ -228,7 +229,7 @@ RSpec.describe Api::V1::StopsController do
   end
 
   it 'cannot create a stop without a venue' do
-    crawl = Crawl.create!(name: 'my crawl', user: user)
+    crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')
     post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
       'description' => 'this will be replaced by existing description',
