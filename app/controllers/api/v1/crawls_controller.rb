@@ -1,13 +1,12 @@
 module Api
   module V1
     class CrawlsController < ApplicationController
-      before_action :authenticate_user!, only: [:create]
+      before_action :authenticate_user!, only: [:create, :update]
+      before_action :set_crawl, only: [:update, :show]
+      before_action :check_owner, only: [:update]
 
       def show
-        @crawl = Crawl.find(params[:id])
         render json: @crawl, serializer: CrawlV1Serializer, root: :crawl
-      rescue ActiveRecord::RecordNotFound
-        head 404, 'content_type' => 'text/plain'
       end
 
       def create
@@ -20,7 +19,31 @@ module Api
         end
       end
 
+      def update
+        if @crawl.update(crawl_params)
+          render json: {}, status: :ok
+        else
+          render json: { errors: @crawl.errors }, status: :unprocessable_entity
+        end
+      end
+
       private
+
+      def check_owner
+        current_user?(@crawl.user_id)
+      end
+
+      def current_user?(user_id)
+        if current_user.id != user_id
+          head :unauthorized
+        end
+      end
+
+      def set_crawl
+        @crawl = Crawl.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        head 404, 'content_type' => 'text/plain'
+      end
 
       def crawl_params
         params.require(:crawl).permit(:name, :city)

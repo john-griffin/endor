@@ -49,4 +49,19 @@ RSpec.describe Api::V1::CrawlsController do
         }
       })
   end
+
+  it 'can update a crawl' do
+    crawl = Crawl.create!(name: "Crawl 1", city: "City 1", user: user)
+    put "/api/v1/crawls/#{crawl.id}", {
+      crawl: {
+        name: 'Crawl 2', city: 'City 2'
+      }
+    }, auth_header
+    expect(response).to have_http_status(200)
+    response_data = JSON.parse(response.body)
+    expect(response_data).to eq({})
+    crawl.reload
+    expect(crawl.name).to eq("Crawl 2")
+    expect(crawl.city).to eq("City 2")
+  end
 end
