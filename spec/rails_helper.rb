@@ -48,3 +48,10 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
 end
+
+def generate_token(user)
+  {
+    authorization: ActionController::HttpAuthentication::Token
+      .encode_credentials(user.authentication_token, email: user.email)
+  }
+end

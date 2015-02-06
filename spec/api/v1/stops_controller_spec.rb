@@ -9,13 +9,6 @@ RSpec.describe Api::V1::StopsController do
     generate_token(user)
   end
 
-  def generate_token(user)
-    {
-      authorization: ActionController::HttpAuthentication::Token
-        .encode_credentials(user.authentication_token, email: user.email)
-    }
-  end
-
   context 'given some stops, venues and crawl' do
     let(:stop1) do
       venue1 = Venue.create(
