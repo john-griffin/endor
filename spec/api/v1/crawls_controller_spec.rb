@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::CrawlsController do
-  let(:user) { User.create!(email: 'u@u.com', password: 'something') }
+  let(:user)  { User.create!(email: 'u@u.com', password: 'something') }
+  let(:user2) { User.create!(email: 'a@a.com', password: 'aaaaaaaaa') }
   let(:auth_header) do
     generate_token(user)
   end
@@ -17,6 +18,7 @@ RSpec.describe Api::V1::CrawlsController do
         'name' => 'my crawl',
         'city' => 'London',
         'user_id' => user.id,
+        'featured' => false,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
         }
@@ -44,6 +46,7 @@ RSpec.describe Api::V1::CrawlsController do
         'name' => 'Foo',
         'city' => 'bar',
         'user_id' => user.id,
+        'featured' => false,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
         }
@@ -60,7 +63,7 @@ RSpec.describe Api::V1::CrawlsController do
   end
 
   it 'can update a crawl' do
-    crawl = Crawl.create!(name: "Crawl 1", city: "City 1", user: user)
+    crawl = Crawl.create!(name: 'Crawl 1', city: 'City 1', user: user)
     put "/api/v1/crawls/#{crawl.id}", {
       crawl: {
         name: 'Crawl 2', city: 'City 2'
@@ -70,12 +73,12 @@ RSpec.describe Api::V1::CrawlsController do
     response_data = JSON.parse(response.body)
     expect(response_data).to eq({})
     crawl.reload
-    expect(crawl.name).to eq("Crawl 2")
-    expect(crawl.city).to eq("City 2")
+    expect(crawl.name).to eq('Crawl 2')
+    expect(crawl.city).to eq('City 2')
   end
 
   it 'can not update a crawl with bad data' do
-    crawl = Crawl.create!(name: "Crawl 1", city: "City 1", user: user)
+    crawl = Crawl.create!(name: 'Crawl 1', city: 'City 1', user: user)
     put "/api/v1/crawls/#{crawl.id}", {
       crawl: {
         name: nil
@@ -85,13 +88,38 @@ RSpec.describe Api::V1::CrawlsController do
   end
 
   it 'rejects updates from wrong user' do
-    user2 = User.create!(email: "a@a.com", password: "aaaaaaaa")
-    crawl = Crawl.create!(name: "Crawl 1", city: "City 1", user: user2)
+    user2 = User.create!(email: 'a@a.com', password: 'aaaaaaaa')
+    crawl = Crawl.create!(name: 'Crawl 1', city: 'City 1', user: user2)
     put "/api/v1/crawls/#{crawl.id}", {
       crawl: {
         name: 'Crawl 2', city: 'City 2'
       }
     }, auth_header
     expect(response).to have_http_status(401)
+  end
+
+  it 'returns only featured crawls when not logged in' do
+    crawl1 = Crawl.create!(
+      name: 'Crawl 1', city: 'London', user: user, featured: true)
+    crawl2 = Crawl.create!(
+      name: 'Crawl 2', city: 'London', user: user2)
+    crawl3 = Crawl.create!(
+      name: 'Crawl 3', city: 'New York', user: user, featured: true)
+    crawl4 = Crawl.create!(
+      name: 'Crawl 4', city: 'New York', user: user2, featured: true)
+    get '/api/v1/crawls'
+    expect(response).to have_http_status(200)
+    response_data = JSON.parse(response.body)
+    expect(response_data['crawls'].count).to eq(3)
+    expect(response_data['crawls']).to start_with(
+      'id' => crawl1.id,
+      'name' => 'Crawl 1',
+      'city' => 'London',
+      'user_id' => user.id,
+      'featured' => true,
+      'links' => {
+        'stops' => "/api/v1/stops?crawl_id=#{crawl1.id}"
+      }
+    )
   end
 end

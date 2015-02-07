@@ -27,6 +27,11 @@ module Api
         end
       end
 
+      def index
+        @crawls = Crawl.where(featured: true)
+        render json: @crawls, each_serializer: CrawlV1Serializer
+      end
+
       private
 
       def check_owner
