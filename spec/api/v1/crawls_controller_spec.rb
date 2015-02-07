@@ -101,11 +101,11 @@ RSpec.describe Api::V1::CrawlsController do
   it 'returns only featured crawls when not logged in' do
     crawl1 = Crawl.create!(
       name: 'Crawl 1', city: 'London', user: user, featured: true)
-    crawl2 = Crawl.create!(
+    Crawl.create!(
       name: 'Crawl 2', city: 'London', user: user2)
-    crawl3 = Crawl.create!(
+    Crawl.create!(
       name: 'Crawl 3', city: 'New York', user: user, featured: true)
-    crawl4 = Crawl.create!(
+    Crawl.create!(
       name: 'Crawl 4', city: 'New York', user: user2, featured: true)
     get '/api/v1/crawls'
     expect(response).to have_http_status(200)

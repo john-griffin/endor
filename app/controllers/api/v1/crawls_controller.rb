@@ -39,9 +39,7 @@ module Api
       end
 
       def current_user?(user_id)
-        if current_user.id != user_id
-          head :unauthorized
-        end
+        head :unauthorized if current_user.id != user_id
       end
 
       def set_crawl
