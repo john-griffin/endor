@@ -28,7 +28,10 @@ module Api
       end
 
       def index
-        @crawls = Crawl.where(featured: true)
+        # featured crawls and user owned crawls if logged in
+        user_crawls = current_user ? current_user.crawls : []
+        featured_crawls = Crawl.where(featured: true)
+        @crawls = user_crawls | featured_crawls
         render json: @crawls, each_serializer: CrawlV1Serializer
       end
 

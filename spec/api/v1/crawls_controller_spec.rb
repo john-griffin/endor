@@ -98,28 +98,51 @@ RSpec.describe Api::V1::CrawlsController do
     expect(response).to have_http_status(401)
   end
 
-  it 'returns only featured crawls when not logged in' do
-    crawl1 = Crawl.create!(
-      name: 'Crawl 1', city: 'London', user: user, featured: true)
-    Crawl.create!(
-      name: 'Crawl 2', city: 'London', user: user2)
-    Crawl.create!(
-      name: 'Crawl 3', city: 'New York', user: user, featured: true)
-    Crawl.create!(
-      name: 'Crawl 4', city: 'New York', user: user2, featured: true)
-    get '/api/v1/crawls'
-    expect(response).to have_http_status(200)
-    response_data = JSON.parse(response.body)
-    expect(response_data['crawls'].count).to eq(3)
-    expect(response_data['crawls']).to start_with(
-      'id' => crawl1.id,
-      'name' => 'Crawl 1',
-      'city' => 'London',
-      'user_id' => user.id,
-      'featured' => true,
-      'links' => {
-        'stops' => "/api/v1/stops?crawl_id=#{crawl1.id}"
-      }
-    )
+  context "given some featured and personal crawls" do
+    let!(:crawl1) do
+      Crawl.create!(name: 'Crawl 1', city: 'London', user: user, featured: true)
+    end
+    let!(:crawl3) do
+      Crawl.create!(name: 'Crawl 3', city: 'New York', user: user)
+    end
+    before(:each) do
+      Crawl.create!(name: 'Crawl 2', city: 'London', user: user2)
+      Crawl.create!(
+        name: 'Crawl 4', city: 'New York', user: user2, featured: true)
+    end
+
+    it 'returns only featured crawls when not logged in' do
+      get '/api/v1/crawls'
+      expect(response).to have_http_status(200)
+      response_data = JSON.parse(response.body)
+      expect(response_data['crawls'].count).to eq(2)
+      expect(response_data['crawls']).to start_with(
+        'id' => crawl1.id,
+        'name' => 'Crawl 1',
+        'city' => 'London',
+        'user_id' => user.id,
+        'featured' => true,
+        'links' => {
+          'stops' => "/api/v1/stops?crawl_id=#{crawl1.id}"
+        }
+      )
+    end
+
+    it 'returns featured and owned crawls when logged in' do
+      get '/api/v1/crawls', {}, auth_header
+      expect(response).to have_http_status(200)
+      response_data = JSON.parse(response.body)
+      expect(response_data['crawls'].count).to eq(3)
+      expect(response_data['crawls']).to include(
+        'id' => crawl3.id,
+        'name' => 'Crawl 3',
+        'city' => 'New York',
+        'user_id' => user.id,
+        'featured' => false,
+        'links' => {
+          'stops' => "/api/v1/stops?crawl_id=#{crawl3.id}"
+        }
+      )
+    end
   end
 end
