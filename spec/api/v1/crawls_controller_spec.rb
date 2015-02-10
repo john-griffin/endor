@@ -100,15 +100,17 @@ RSpec.describe Api::V1::CrawlsController do
     expect(response).to have_http_status(401)
   end
 
-  context "given some featured and personal crawls" do
+  context 'given some featured and personal crawls' do
     let!(:crawl1) do
       Crawl.create!(name: 'Crawl 1', city: 'London', user: user, featured: true)
+    end
+    let!(:crawl2) do
+      Crawl.create!(name: 'Crawl 2', city: 'London', user: user2)
     end
     let!(:crawl3) do
       Crawl.create!(name: 'Crawl 3', city: 'New York', user: user)
     end
     before(:each) do
-      Crawl.create!(name: 'Crawl 2', city: 'London', user: user2)
       Crawl.create!(
         name: 'Crawl 4', city: 'New York', user: user2, featured: true)
     end
@@ -147,6 +149,21 @@ RSpec.describe Api::V1::CrawlsController do
           'stops' => "/api/v1/stops?crawl_id=#{crawl3.id}"
         }
       )
+    end
+
+    it 'can delete an owned crawl' do
+      delete "/api/v1/crawls/#{crawl1.id}", {}, auth_header
+      expect(response).to have_http_status(204)
+    end
+
+    it 'can not delete someone elses crawl' do
+      delete "/api/v1/crawls/#{crawl2.id}", {}, auth_header
+      expect(response).to have_http_status(401)
+    end
+
+    it 'can not delete a crawl unauthenticated' do
+      delete "/api/v1/crawls/#{crawl1.id}"
+      expect(response).to have_http_status(401)
     end
   end
 end

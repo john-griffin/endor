@@ -4,7 +4,7 @@ Rails.application.routes.draw do
     namespace :api, format: false do
       namespace :v1 do
         resources :sessions, only: :create
-        resources :crawls, only: [:show, :create, :update, :index]
+        resources :crawls, except: [:new, :edit]
         resources :stops, except: [:new, :edit]
       end
     end
