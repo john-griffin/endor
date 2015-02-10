@@ -19,6 +19,7 @@ RSpec.describe Api::V1::CrawlsController do
         'city' => 'London',
         'user_id' => user.id,
         'featured' => false,
+        'stop_count' => 0,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
         }
@@ -47,6 +48,7 @@ RSpec.describe Api::V1::CrawlsController do
         'city' => 'bar',
         'user_id' => user.id,
         'featured' => false,
+        'stop_count' => 0,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
         }
@@ -122,6 +124,7 @@ RSpec.describe Api::V1::CrawlsController do
         'city' => 'London',
         'user_id' => user.id,
         'featured' => true,
+        'stop_count' => 0,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl1.id}"
         }
@@ -139,6 +142,7 @@ RSpec.describe Api::V1::CrawlsController do
         'city' => 'New York',
         'user_id' => user.id,
         'featured' => false,
+        'stop_count' => 0,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl3.id}"
         }

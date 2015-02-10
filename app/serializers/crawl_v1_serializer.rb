@@ -1,5 +1,9 @@
 class CrawlV1Serializer < ActiveModel::Serializer
-  attributes :id, :name, :city, :user_id, :featured, :links
+  attributes :id, :name, :city, :user_id, :featured, :stop_count, :links
+
+  def stop_count
+    object.stops.length
+  end
 
   def links
     {
