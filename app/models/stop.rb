@@ -9,4 +9,7 @@ class Stop < ActiveRecord::Base
   validates_associated :venue
   validates :crawl, presence: true
   validates :venue, presence: true
+  validates :photo_prefix, presence: true
+  validates :photo_suffix, presence: true
+  validates :photo_id, presence: true
 end
