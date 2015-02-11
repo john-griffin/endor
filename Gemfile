@@ -35,6 +35,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'devise', '~> 3.4.1'
 gem 'active_model_serializers', '~> 0.8.3'
 gem 'ranked-model', '~> 0.4.0'
+gem 'puma', '~> 2.11.0'
 
 group :test do
   gem 'simplecov', '~> 0.8.0', require: false
