@@ -54,3 +54,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.2.0'
 end
 
+group :production do
+  gem 'rails_12factor', '~> 0.0.3'
+end
+
