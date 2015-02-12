@@ -158,8 +158,7 @@ RSpec.describe Api::V1::StopsController do
     { 'stop' => {
       'id' => stop.id, 'row_order' => stop.row_order, 'name' => 'foo',
       'crawl_id' => stop.crawl_id,
-      'venue_name' => 'B.B. King Blues Club & Grill',
-      'description' => "B.B. King's Blues Club & Grill is the premier",
+      'venue_name' => 'Club & Grill', 'description' => 'The best grill',
       'photo_id' => 'blarg', 'photo_prefix' => 'http://foo.com',
       'photo_suffix' => 'blarg.jpg',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
@@ -172,14 +171,14 @@ RSpec.describe Api::V1::StopsController do
     crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')
     post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
-      'description' => "B.B. King's Blues Club & Grill is the premier",
+      'description' => 'The best grill',
       'photo_prefix' => 'http://foo.com',
       'photo_suffix' => 'blarg.jpg',
       'photo_id' => 'blarg',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'point' => [51.4951849624377, -0.0837063789367676],
-      'venue_name' => 'B.B. King Blues Club & Grill',
+      'venue_name' => 'Club & Grill',
       'row_order' => nil, # ember app sends through nil row_order
       'row_order_position' => 'last',
       'crawl_id' => crawl.id
@@ -188,16 +187,16 @@ RSpec.describe Api::V1::StopsController do
     response_data = JSON.parse(response.body)
     stop = Stop.first
     expect(response_data).to eq(expected_stop(stop))
-    expect(stop.venue.name).to eq('B.B. King Blues Club & Grill')
+    expect(stop.venue.name).to eq('Club & Grill')
   end
 
   it 'given existing crawl and venue, it creates a stop and reuses venue' do
     Venue.create!(
-      name: 'B.B. King Blues Club & Grill',
+      name: 'Club & Grill',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
       'point' => [51.49518496243775, -0.08370637893676758],
-      'description' => "B.B. King's Blues Club & Grill is the premier"
+      'description' => 'The best grill'
     )
     crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')
     post '/api/v1/stops', { 'stop' => {
@@ -205,7 +204,7 @@ RSpec.describe Api::V1::StopsController do
       'description' => 'this will be replaced by existing description',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
-      'venue_name' => 'B.B. King Blues Club & Grill',
+      'venue_name' => 'Club & Grill',
       'photo_prefix' => 'http://foo.com',
       'photo_suffix' => 'blarg.jpg',
       'photo_id' => 'blarg',
@@ -217,7 +216,7 @@ RSpec.describe Api::V1::StopsController do
     response_data = JSON.parse(response.body)
     stop = Stop.first
     expect(response_data).to eq(expected_stop(stop))
-    expect(stop.venue.name).to eq('B.B. King Blues Club & Grill')
+    expect(stop.venue.name).to eq('Club & Grill')
     expect(Venue.count).to eq(1)
   end
 
