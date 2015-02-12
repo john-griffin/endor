@@ -4,6 +4,7 @@ module Api
       before_action :authenticate_user!, only: [:create, :update, :destroy]
       before_action :set_stop, only: [:update, :destroy, :show]
       before_action :set_venue, only: [:update, :create]
+      before_action :set_crawl, only: [:create]
       before_action :check_owner, only: [:update, :destroy]
 
       def index
@@ -18,8 +19,7 @@ module Api
       end
 
       def create
-        crawl = Crawl.find(stop_params[:crawl_id])
-        current_user?(crawl.user.id)
+        current_user?(@crawl.user.id)
         @stop = Stop.new(stop_params.merge(venue: @venue))
 
         if @stop.save
@@ -28,8 +28,6 @@ module Api
         else
           render json: { errors: @stop.errors }, status: :unprocessable_entity
         end
-      rescue ActiveRecord::RecordNotFound
-        head 422, 'content_type' => 'text/plain'
       end
 
       def update
@@ -60,6 +58,12 @@ module Api
 
       def current_user?(user_id)
         head :unauthorized if current_user.id != user_id
+      end
+
+      def set_crawl
+        @crawl = Crawl.find(stop_params[:crawl_id])
+      rescue ActiveRecord::RecordNotFound
+        head 422, 'content_type' => 'text/plain'
       end
 
       def set_venue
