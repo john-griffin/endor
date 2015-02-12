@@ -2,8 +2,8 @@ module Api
   module V1
     class CrawlsController < ApplicationController
       before_action :authenticate_user!, only: [:create, :update, :destroy]
-      before_action :set_crawl, only: [:update, :show, :destroy]
-      before_action :check_owner, only: [:update, :destroy]
+      before_action :set_crawl,          only: [:update, :show, :destroy]
+      before_action :check_owner,        only: [:update, :destroy]
 
       def show
         render json: @crawl, serializer: CrawlV1Serializer, root: :crawl
