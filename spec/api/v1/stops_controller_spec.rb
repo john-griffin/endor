@@ -15,6 +15,7 @@ RSpec.describe Api::V1::StopsController do
         name: 'venue1',
         description: 'desc 1',
         location: ['address1', 'address 2'],
+        point: [51.12, -0.083],
         foursquare_id: 'id1'
       )
       Stop.new(name: 'stop 1', venue: venue1, row_order_position: 'last',
@@ -26,6 +27,7 @@ RSpec.describe Api::V1::StopsController do
         name: 'venue2',
         description: 'desc 2',
         location: ['address3', 'address 4', 'address 5'],
+        point: [51.49518496243775, -0.08370637893676758],
         foursquare_id: 'id2'
       )
       Stop.new(name: 'stop 2', venue: venue2, row_order_position: 'last',
@@ -53,6 +55,7 @@ RSpec.describe Api::V1::StopsController do
           'photo_prefix' => 'http://example.com',
           'photo_suffix' => '1.png',
           'location' => ['address1', 'address 2'],
+          'point' => [51.12, -0.083],
           'foursquare_id' => 'id1'
         }
       )
@@ -73,6 +76,7 @@ RSpec.describe Api::V1::StopsController do
           'photo_prefix' => 'http://example.com',
           'photo_suffix' => '1.png',
           'location' => ['address1', 'address 2'],
+          'point' => [51.12, -0.083],
           'foursquare_id' => 'id1'
         },
         {
@@ -86,6 +90,7 @@ RSpec.describe Api::V1::StopsController do
           'photo_prefix' => 'http://example.com',
           'photo_suffix' => '2.png',
           'location' => ['address3', 'address 4', 'address 5'],
+          'point' => [51.4951849624377, -0.0837063789367676],
           'foursquare_id' => 'id2'
         }
       ])
@@ -158,6 +163,7 @@ RSpec.describe Api::V1::StopsController do
       'photo_id' => 'blarg', 'photo_prefix' => 'http://foo.com',
       'photo_suffix' => 'blarg.jpg',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
+      'point' => [51.4951849624377, -0.0837063789367676],
       'foursquare_id' => '410c3280f964a520b20b1fe3'
     } }
   end
@@ -172,6 +178,7 @@ RSpec.describe Api::V1::StopsController do
       'photo_id' => 'blarg',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
+      'point' => [51.4951849624377, -0.0837063789367676],
       'venue_name' => 'B.B. King Blues Club & Grill',
       'row_order' => nil, # ember app sends through nil row_order
       'row_order_position' => 'last',
@@ -189,6 +196,7 @@ RSpec.describe Api::V1::StopsController do
       name: 'B.B. King Blues Club & Grill',
       'foursquare_id' => '410c3280f964a520b20b1fe3',
       'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
+      'point' => [51.49518496243775, -0.08370637893676758],
       'description' => "B.B. King's Blues Club & Grill is the premier"
     )
     crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')

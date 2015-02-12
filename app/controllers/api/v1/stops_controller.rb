@@ -85,7 +85,7 @@ module Api
 
       def venue_params
         vp = reqest_params.slice(
-          :description, :venue_name, :foursquare_id, :location)
+          :description, :venue_name, :foursquare_id, :location, :point)
         vp[:name] = vp.delete(:venue_name)
         vp
       end
@@ -94,7 +94,7 @@ module Api
         params.require(:stop).permit(:crawl_id, :name, :row_order_position,
                                      :description, :venue_name, :photo_id,
                                      :photo_prefix, :photo_suffix,
-                                     :foursquare_id, location: [])
+                                     :foursquare_id, point: [], location: [])
       end
     end
   end

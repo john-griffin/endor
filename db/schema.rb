@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150212124700) do
+ActiveRecord::Schema.define(version: 20150212125127) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -71,6 +71,7 @@ ActiveRecord::Schema.define(version: 20150212124700) do
     t.text     "description"
     t.text     "location",                   array: true
     t.string   "foursquare_id", null: false
+    t.point    "point",         null: false
   end
 
   add_index "venues", ["foursquare_id"], name: "index_venues_on_foursquare_id", using: :btree
