@@ -1,13 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::StopsController do
-  let!(:user) do
-    User.create!(email: 'u@u.com', password: 'something')
-  end
-
-  let(:auth_header) do
-    generate_token(user)
-  end
+  let!(:user) { User.create!(email: 'u@u.com', password: 'something') }
+  let(:auth_header) { generate_token(user) }
 
   context 'given some stops, venues and crawl' do
     let(:stop1) do
@@ -39,7 +34,7 @@ RSpec.describe Api::V1::StopsController do
         name: 'my crawl', stops: [stop1, stop2], user: user, city: 'London')
     end
 
-    it 'can fetch a single stop' do
+    it 'show action returns a single stop' do
       get "/api/v1/stops/#{stop1.id}"
       expect(response).to have_http_status(200)
       response_data = JSON.parse(response.body)
@@ -61,7 +56,7 @@ RSpec.describe Api::V1::StopsController do
       )
     end
 
-    it 'returns stops and venues for a crawl' do
+    it 'index action returns combined stops and venues for a crawl' do
       get '/api/v1/stops',  crawl_id: crawl.id
       response_data = JSON.parse(response.body)
       expect(response_data).to eq('stops' => [
@@ -96,7 +91,7 @@ RSpec.describe Api::V1::StopsController do
       ])
     end
 
-    it 'can update a stop and return updated details' do
+    it 'update action can modify a stop and return updated details' do
       expect(stop1.row_order).to be < stop2.row_order
       put "/api/v1/stops/#{stop1.id}", { stop: {
         'name' => 'stop 1 updated',
@@ -114,7 +109,7 @@ RSpec.describe Api::V1::StopsController do
       expect(response_data['stop']['row_order']).to be > stop2.row_order
     end
 
-    it "can't set bad params" do
+    it "update action can't set bad params" do
       put "/api/v1/stops/#{stop1.id}", { stop: {
         'name' => 'stop 1 updated',
         'venue_name' => 'venue1',
@@ -126,102 +121,104 @@ RSpec.describe Api::V1::StopsController do
       expect(response).to have_http_status(422)
     end
 
-    it 'can delete a stop' do
+    it 'destroy action can delete a stop' do
       delete "/api/v1/stops/#{stop1.id}", {}, auth_header
       expect(response).to have_http_status(204)
       expect(Stop.where(id: stop1.id)).to be_empty
     end
 
-    it 'can not delete a stop owner by another user' do
+    it 'destroy action cannot delete a stop owner by another user' do
       user2 = User.create!(email: 'b@b.com', password: 'somethingelse')
       delete "/api/v1/stops/#{stop1.id}", {}, generate_token(user2)
       expect(response).to have_http_status(401)
     end
 
-    it "can't delete a stop that doesn't exist" do
+    it "destroy action can't delete a stop that doesn't exist" do
       delete '/api/v1/stops/47', {}, auth_header
       expect(response).to have_http_status(404)
     end
   end
 
-  it 'returns 422 if crawl id is missing' do
+  it 'show action returns 422 if crawl id is missing' do
     get '/api/v1/stops'
     expect(response).to have_http_status(422)
   end
 
-  it 'returns empty array if no results' do
+  it 'index action returns empty array if no results' do
     get '/api/v1/stops?crawl_id=2'
     response_data = JSON.parse(response.body)
-    expect(response_data).to eq('stops' => [])
+    expect(response_data["stops"]).to be_empty
   end
 
-  def expected_stop(stop)
-    { 'stop' => {
-      'id' => stop.id, 'row_order' => stop.row_order, 'name' => 'foo',
-      'crawl_id' => stop.crawl_id,
-      'venue_name' => 'Club & Grill', 'description' => 'The best grill',
-      'photo_id' => 'blarg', 'photo_prefix' => 'http://foo.com',
-      'photo_suffix' => 'blarg.jpg',
-      'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
-      'point' => [51.4951849624377, -0.0837063789367676],
-      'foursquare_id' => '410c3280f964a520b20b1fe3'
-    } }
+  context 'given an existing crawl' do
+    def expected_stop(stop)
+      { 'stop' => {
+        'id' => stop.id, 'row_order' => stop.row_order, 'name' => 'foo',
+        'crawl_id' => stop.crawl_id,
+        'venue_name' => 'Club & Grill', 'description' => 'The best grill',
+        'photo_id' => 'blarg', 'photo_prefix' => 'http://foo.com',
+        'photo_suffix' => 'blarg.jpg',
+        'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
+        'point' => [51.4951849624377, -0.0837063789367676],
+        'foursquare_id' => '410c3280f964a520b20b1fe3'
+      } }
+    end
+
+    let(:crawl) { Crawl.create!(name: 'my crawl', user: user, city: 'London') }
+
+    it 'create action creates a stop and venue' do
+      post '/api/v1/stops', { 'stop' => {
+        'name' => 'foo',
+        'description' => 'The best grill',
+        'photo_prefix' => 'http://foo.com',
+        'photo_suffix' => 'blarg.jpg',
+        'photo_id' => 'blarg',
+        'foursquare_id' => '410c3280f964a520b20b1fe3',
+        'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
+        'point' => [51.4951849624377, -0.0837063789367676],
+        'venue_name' => 'Club & Grill',
+        'row_order' => nil, # ember app sends through nil row_order
+        'row_order_position' => 'last',
+        'crawl_id' => crawl.id
+      } }, auth_header
+      expect(response).to have_http_status(201)
+      response_data = JSON.parse(response.body)
+      stop = Stop.first
+      expect(response_data).to eq(expected_stop(stop))
+      expect(stop.venue.name).to eq('Club & Grill')
+    end
+
+    it 'create action creates a stop and reuses venue' do
+      Venue.create!(
+        name: 'Club & Grill',
+        'foursquare_id' => '410c3280f964a520b20b1fe3',
+        'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
+        'point' => [51.49518496243775, -0.08370637893676758],
+        'description' => 'The best grill'
+      )
+      post '/api/v1/stops', { 'stop' => {
+        'name' => 'foo',
+        'description' => 'this will be replaced by existing description',
+        'foursquare_id' => '410c3280f964a520b20b1fe3',
+        'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
+        'venue_name' => 'Club & Grill',
+        'photo_prefix' => 'http://foo.com',
+        'photo_suffix' => 'blarg.jpg',
+        'photo_id' => 'blarg',
+        'row_order' => nil, # ember app sends through nil row_order
+        'row_order_position' => 'last',
+        'crawl_id' => crawl.id
+      } }, auth_header
+      expect(response).to have_http_status(201)
+      response_data = JSON.parse(response.body)
+      stop = Stop.first
+      expect(response_data).to eq(expected_stop(stop))
+      expect(stop.venue.name).to eq('Club & Grill')
+      expect(Venue.count).to eq(1)
+    end
   end
 
-  it 'given existing crawl, it creates a stop and venue' do
-    crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')
-    post '/api/v1/stops', { 'stop' => {
-      'name' => 'foo',
-      'description' => 'The best grill',
-      'photo_prefix' => 'http://foo.com',
-      'photo_suffix' => 'blarg.jpg',
-      'photo_id' => 'blarg',
-      'foursquare_id' => '410c3280f964a520b20b1fe3',
-      'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
-      'point' => [51.4951849624377, -0.0837063789367676],
-      'venue_name' => 'Club & Grill',
-      'row_order' => nil, # ember app sends through nil row_order
-      'row_order_position' => 'last',
-      'crawl_id' => crawl.id
-    } }, auth_header
-    expect(response).to have_http_status(201)
-    response_data = JSON.parse(response.body)
-    stop = Stop.first
-    expect(response_data).to eq(expected_stop(stop))
-    expect(stop.venue.name).to eq('Club & Grill')
-  end
-
-  it 'given existing crawl and venue, it creates a stop and reuses venue' do
-    Venue.create!(
-      name: 'Club & Grill',
-      'foursquare_id' => '410c3280f964a520b20b1fe3',
-      'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
-      'point' => [51.49518496243775, -0.08370637893676758],
-      'description' => 'The best grill'
-    )
-    crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')
-    post '/api/v1/stops', { 'stop' => {
-      'name' => 'foo',
-      'description' => 'this will be replaced by existing description',
-      'foursquare_id' => '410c3280f964a520b20b1fe3',
-      'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
-      'venue_name' => 'Club & Grill',
-      'photo_prefix' => 'http://foo.com',
-      'photo_suffix' => 'blarg.jpg',
-      'photo_id' => 'blarg',
-      'row_order' => nil, # ember app sends through nil row_order
-      'row_order_position' => 'last',
-      'crawl_id' => crawl.id
-    } }, auth_header
-    expect(response).to have_http_status(201)
-    response_data = JSON.parse(response.body)
-    stop = Stop.first
-    expect(response_data).to eq(expected_stop(stop))
-    expect(stop.venue.name).to eq('Club & Grill')
-    expect(Venue.count).to eq(1)
-  end
-
-  it 'cannot create a stop without a crawl' do
+  it 'create action cannot create a stop without a crawl' do
     post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
       'description' => 'this will be replaced by existing description'
@@ -229,7 +226,7 @@ RSpec.describe Api::V1::StopsController do
     expect(response).to have_http_status(422)
   end
 
-  it 'cannot create a stop without a venue' do
+  it 'create action cannot create a stop without a venue' do
     crawl = Crawl.create!(name: 'my crawl', user: user, city: 'London')
     post '/api/v1/stops', { 'stop' => {
       'name' => 'foo',
