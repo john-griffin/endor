@@ -58,7 +58,7 @@ module Api
       end
 
       def crawl_params
-        params.require(:crawl).permit(:name, :city)
+        params.require(:crawl).permit(:name, :city, :image_url)
       end
     end
   end

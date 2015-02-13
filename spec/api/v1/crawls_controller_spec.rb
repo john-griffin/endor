@@ -19,6 +19,7 @@ RSpec.describe Api::V1::CrawlsController do
         'city' => 'London',
         'user_id' => user.id,
         'featured' => false,
+        'image_url' => nil,
         'stop_count' => 0,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
@@ -35,7 +36,7 @@ RSpec.describe Api::V1::CrawlsController do
   it 'can create a crawl' do
     post '/api/v1/crawls', {
       crawl: {
-        name: 'Foo', city: 'bar'
+        name: 'Foo', city: 'bar', image_url: 'foo.jpg'
       }
     }, auth_header
     expect(response).to have_http_status(201)
@@ -48,6 +49,7 @@ RSpec.describe Api::V1::CrawlsController do
         'city' => 'bar',
         'user_id' => user.id,
         'featured' => false,
+        'image_url' => 'foo.jpg',
         'stop_count' => 0,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
@@ -126,6 +128,7 @@ RSpec.describe Api::V1::CrawlsController do
         'city' => 'London',
         'user_id' => user.id,
         'featured' => true,
+        'image_url' => nil,
         'stop_count' => 0,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl1.id}"
@@ -144,6 +147,7 @@ RSpec.describe Api::V1::CrawlsController do
         'city' => 'New York',
         'user_id' => user.id,
         'featured' => false,
+        'image_url' => nil,
         'stop_count' => 0,
         'links' => {
           'stops' => "/api/v1/stops?crawl_id=#{crawl3.id}"

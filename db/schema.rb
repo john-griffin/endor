@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150212125127) do
+ActiveRecord::Schema.define(version: 20150213001039) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20150212125127) do
     t.integer  "user_id",                    null: false
     t.string   "city",                       null: false
     t.boolean  "featured",   default: false, null: false
+    t.text     "image_url"
   end
 
   add_index "crawls", ["user_id"], name: "index_crawls_on_user_id", using: :btree
