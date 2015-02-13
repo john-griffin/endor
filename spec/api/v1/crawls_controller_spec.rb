@@ -156,7 +156,7 @@ RSpec.describe Api::V1::CrawlsController do
     end
 
     it 'can delete an owned crawl with stops' do
-      v1 = Venue.create!(foursquare_id: 'blah')
+      v1 = Venue.create!(foursquare_id: 'blah', point: [1,1])
       crawl1.stops.create!(
         venue: v1, photo_prefix: 'a', photo_suffix: 'b', photo_id: 'c')
       delete "/api/v1/crawls/#{crawl1.id}", {}, auth_header

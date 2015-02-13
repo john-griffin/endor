@@ -103,6 +103,7 @@ RSpec.describe Api::V1::StopsController do
         'venue_name' => 'venue1',
         'description' => 'desc 1',
         'location' => ['address1', 'address 2'],
+        'point' => [51.4951849624377, -0.0837063789367676],
         'foursquare_id' => 'id47',
         'row_order_position' => 'down'
       } }, auth_header
