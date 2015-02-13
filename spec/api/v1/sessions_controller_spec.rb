@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::SessionsController do
-  it 'can log in' do
+  it 'create action sign a user in' do
     u = User.create!(email: 'u@u.com', password: 'something')
     post '/api/v1/sessions', 'user' => {
       'email' => 'u@u.com', 'password' => 'something'
@@ -15,7 +15,7 @@ RSpec.describe Api::V1::SessionsController do
     )
   end
 
-  it 'can be rejected' do
+  it 'create action can be rejected with bad credentials' do
     post '/api/v1/sessions', 'user' => {
       'email' => 'u@u.com', 'password' => 'something'
     }
