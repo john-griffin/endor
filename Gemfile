@@ -33,7 +33,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # gem 'capistrano-rails', group: :development
 
 gem 'devise', '~> 3.4.1'
-gem 'active_model_serializers', '~> 0.8.3'
+gem 'jsonapi-resources', github: 'cerebris/jsonapi-resources', ref: 'ba8d7b40'
 gem 'ranked-model', '~> 0.4.0'
 
 group :test do

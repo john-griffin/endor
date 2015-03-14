@@ -13,16 +13,21 @@ RSpec.describe Api::V1::CrawlsController do
       expect(response).to have_http_status(200)
       response_data = JSON.parse(response.body)
       expect(response_data).to eq(
-        'crawl' => {
-          'id' => crawl.id,
+        'data' => {
+          'id' => crawl.id.to_s,
           'name' => 'my crawl',
           'city' => 'London',
-          'user_id' => user.id,
+          'user-id' => user.id,
           'featured' => false,
-          'image_url' => nil,
-          'stop_count' => 0,
+          'image-url' => nil,
+          'stop-count' => 0,
+          'type' => 'crawls',
           'links' => {
-            'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
+            "self"=>"/api/v1/crawls/#{crawl.id}",
+            "stops"=>{
+              "self"=>"/api/v1/crawls/#{crawl.id}/links/stops",
+              "related"=>"/api/v1/crawls/#{crawl.id}/stops"
+            }
           }
         }
       )
@@ -94,16 +99,21 @@ RSpec.describe Api::V1::CrawlsController do
     response_data = JSON.parse(response.body)
     crawl = Crawl.last
     expect(response_data).to eq(
-      'crawl' => {
-        'id' => crawl.id,
+      'data' => {
+        'id' => crawl.id.to_s,
         'name' => 'Foo',
         'city' => 'bar',
-        'user_id' => user.id,
+        'user-id' => user.id,
         'featured' => false,
-        'image_url' => 'foo.jpg',
-        'stop_count' => 0,
+        'image-url' => 'foo.jpg',
+        'stop-count' => 0,
+        'type' => 'crawls',
         'links' => {
-          'stops' => "/api/v1/stops?crawl_id=#{crawl.id}"
+          "self"=>"/api/v1/crawls/#{crawl.id}",
+          "stops"=>{
+            "self"=>"/api/v1/crawls/#{crawl.id}/links/stops",
+            "related"=>"/api/v1/crawls/#{crawl.id}/stops"
+          }
         }
       })
   end
@@ -136,17 +146,22 @@ RSpec.describe Api::V1::CrawlsController do
       get '/api/v1/crawls'
       expect(response).to have_http_status(200)
       response_data = JSON.parse(response.body)
-      expect(response_data['crawls'].count).to eq(2)
-      expect(response_data['crawls']).to start_with(
-        'id' => crawl1.id,
+      expect(response_data['data'].count).to eq(2)
+      expect(response_data['data']).to start_with(
+        'id' => crawl1.id.to_s,
         'name' => 'Crawl 1',
         'city' => 'London',
-        'user_id' => user.id,
+        'user-id' => user.id,
         'featured' => true,
-        'image_url' => nil,
-        'stop_count' => 0,
+        'image-url' => nil,
+        'stop-count' => 0,
+        'type' => 'crawls',
         'links' => {
-          'stops' => "/api/v1/stops?crawl_id=#{crawl1.id}"
+          "self" => "/api/v1/crawls/#{crawl1.id}",
+          "stops" => {
+            "self" => "/api/v1/crawls/#{crawl1.id}/links/stops",
+            "related" => "/api/v1/crawls/#{crawl1.id}/stops"
+          }
         }
       )
     end
@@ -155,17 +170,22 @@ RSpec.describe Api::V1::CrawlsController do
       get '/api/v1/crawls', {}, auth_header
       expect(response).to have_http_status(200)
       response_data = JSON.parse(response.body)
-      expect(response_data['crawls'].count).to eq(3)
-      expect(response_data['crawls']).to include(
-        'id' => crawl3.id,
+      expect(response_data['data'].count).to eq(3)
+      expect(response_data['data']).to include(
+        'id' => crawl3.id.to_s,
         'name' => 'Crawl 3',
         'city' => 'New York',
-        'user_id' => user.id,
+        'user-id' => user.id,
         'featured' => false,
-        'image_url' => nil,
-        'stop_count' => 0,
+        'image-url' => nil,
+        'stop-count' => 0,
+        'type' => 'crawls',
         'links' => {
-          'stops' => "/api/v1/stops?crawl_id=#{crawl3.id}"
+          "self" => "/api/v1/crawls/#{crawl3.id}",
+          "stops" => {
+            "self" => "/api/v1/crawls/#{crawl3.id}/links/stops",
+            "related" => "/api/v1/crawls/#{crawl3.id}/stops"
+          }
         }
       )
     end

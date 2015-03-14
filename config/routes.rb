@@ -4,8 +4,8 @@ Rails.application.routes.draw do
     namespace :api, format: false do
       namespace :v1 do
         resources :sessions, only: :create
-        resources :crawls, except: [:new, :edit]
-        resources :stops, except: [:new, :edit]
+        jsonapi_resources :crawls, except: [:new, :edit]
+        jsonapi_resources :stops, except: [:new, :edit]
       end
     end
   end

@@ -12,7 +12,11 @@ module Api
           @stops = Stop.where(crawl_id: params[:crawl_id])
                    .rank(:row_order)
                    .includes(:venue)
-          render json: @stops, each_serializer: StopV1Serializer
+
+          serializer = JSONAPI::ResourceSerializer.new(StopResource)
+          render json: serializer.serialize_to_hash(
+            @stops.map{|s| StopResource.new(s)}
+          )
         else
           head :unprocessable_entity, 'content_type' => 'text/plain'
         end
@@ -23,8 +27,9 @@ module Api
         @stop = Stop.new(stop_params.merge(venue: @venue))
 
         if @stop.save
-          render json: @stop, status: :created, root: :stop,
-                 serializer: StopV1Serializer, location: [:api, :v1, @stop]
+          serializer = JSONAPI::ResourceSerializer.new(StopResource)
+          render json: serializer.serialize_to_hash(StopResource.new(@stop)),
+                 status: :created
         else
           render json: { errors: @stop.errors }, status: :unprocessable_entity
         end
@@ -32,8 +37,9 @@ module Api
 
       def update
         if @stop.update(stop_params.merge(venue: @venue))
-          render json: @stop, status: :ok, root: :stop,
-                 serializer: StopV1Serializer, location: [:api, :v1, @stop]
+          serializer = JSONAPI::ResourceSerializer.new(StopResource)
+          render json: serializer.serialize_to_hash(StopResource.new(@stop)),
+                 status: :ok
         else
           render json: { errors: @stop.errors }, status: :unprocessable_entity
         end
@@ -46,8 +52,9 @@ module Api
       end
 
       def show
-        render json: @stop, status: :ok, root: :stop,
-               serializer: StopV1Serializer, location: [:api, :v1, @stop]
+        serializer = JSONAPI::ResourceSerializer.new(StopResource)
+        render json: serializer.serialize_to_hash(StopResource.new(@stop)),
+               status: :ok
       end
 
       private

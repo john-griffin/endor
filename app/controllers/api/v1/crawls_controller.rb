@@ -1,3 +1,5 @@
+require 'jsonapi/resource_serializer'
+
 module Api
   module V1
     class CrawlsController < ApplicationController
@@ -6,14 +8,15 @@ module Api
       before_action :check_owner,        only: [:update, :destroy]
 
       def show
-        render json: @crawl, serializer: CrawlV1Serializer, root: :crawl
+        serializer = JSONAPI::ResourceSerializer.new(CrawlResource)
+        render json: serializer.serialize_to_hash(CrawlResource.new(@crawl))
       end
 
       def create
         @crawl = current_user.crawls.new(crawl_params)
         if @crawl.save
-          render json: @crawl, status: :created, root: :crawl,
-                 serializer: CrawlV1Serializer, location: [:api, :v1, @crawl]
+          serializer = JSONAPI::ResourceSerializer.new(CrawlResource)
+          render json: serializer.serialize_to_hash(CrawlResource.new(@crawl)), status: :created
         else
           render json: { errors: @crawl.errors }, status: :unprocessable_entity
         end
@@ -32,7 +35,10 @@ module Api
         user_crawls = current_user ? current_user.crawls.includes(:stops) : []
         featured_crawls = Crawl.where(featured: true).includes(:stops)
         @crawls = user_crawls | featured_crawls
-        render json: @crawls, each_serializer: CrawlV1Serializer
+        serializer = JSONAPI::ResourceSerializer.new(CrawlResource)
+        render json: serializer.serialize_to_hash(
+          @crawls.map{|c| CrawlResource.new(c)}
+        )
       end
 
       def destroy

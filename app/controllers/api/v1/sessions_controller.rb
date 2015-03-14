@@ -5,8 +5,10 @@ module Api
         self.resource = warden.authenticate(auth_options)
         if resource
           sign_in(resource_name, resource)
-          render json: resource, status: 201,
-                 serializer: ResourceV1Serializer, root: false
+          render json: {
+            token: resource.authentication_token,
+            email: resource.email, id: resource.id
+          }, status: 201
         else
           head :unauthorized, 'content_type' => 'text/plain'
         end

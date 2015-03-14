@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/cerebris/jsonapi-resources.git
+  revision: ba8d7b40d61fd2b03b71bde5dbbe147271066251
+  ref: ba8d7b40
+  specs:
+    jsonapi-resources (0.2.0)
+
+GIT
   remote: git://github.com/colszowka/simplecov-html.git
   revision: 9973fbe887ecd31ff430274b2c2b43d386927afb
   specs:
@@ -26,8 +33,6 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.1)
-    active_model_serializers (0.8.3)
-      activemodel (>= 3.0)
     activejob (4.2.0)
       activesupport (= 4.2.0)
       globalid (>= 0.3.0)
@@ -202,12 +207,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_model_serializers (~> 0.8.3)
   byebug
   coffee-rails (~> 4.1.0)
   devise (~> 3.4.1)
   jbuilder (~> 2.0)
   jquery-rails
+  jsonapi-resources!
   pg
   puma (~> 2.11.0)
   rails (= 4.2.0)

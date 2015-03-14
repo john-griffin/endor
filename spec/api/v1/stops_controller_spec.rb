@@ -39,19 +39,21 @@ RSpec.describe Api::V1::StopsController do
       expect(response).to have_http_status(200)
       response_data = JSON.parse(response.body)
       expect(response_data).to eq(
-        'stop' => {
-          'id' => stop1.id,
-          'crawl_id' => crawl.id,
-          'row_order' => stop1.row_order,
+        'data' => {
+          'id' => stop1.id.to_s,
+          'crawl-id' => crawl.id,
+          'row-order' => stop1.row_order,
           'name' => 'stop 1',
-          'venue_name' => 'venue1',
+          'venue-name' => 'venue1',
           'description' => 'desc 1',
-          'photo_id' => 'p1',
-          'photo_prefix' => 'http://example.com',
-          'photo_suffix' => '1.png',
+          'photo-id' => 'p1',
+          'photo-prefix' => 'http://example.com',
+          'photo-suffix' => '1.png',
           'location' => ['address1', 'address 2'],
           'point' => [51.12, -0.083],
-          'foursquare_id' => 'id1'
+          'foursquare-id' => 'id1',
+          "type"=>"stops",
+          "links"=>{"self"=>"/api/v1/stops/#{stop1.id}"}
         }
       )
     end
@@ -59,34 +61,38 @@ RSpec.describe Api::V1::StopsController do
     it 'index action returns combined stops and venues for a crawl' do
       get '/api/v1/stops',  crawl_id: crawl.id
       response_data = JSON.parse(response.body)
-      expect(response_data).to eq('stops' => [
+      expect(response_data).to eq('data' => [
         {
-          'id' => stop1.id,
-          'crawl_id' => crawl.id,
-          'row_order' => stop1.row_order,
+          'id' => stop1.id.to_s,
+          'crawl-id' => crawl.id,
+          'row-order' => stop1.row_order,
           'name' => 'stop 1',
-          'venue_name' => 'venue1',
+          'venue-name' => 'venue1',
           'description' => 'desc 1',
-          'photo_id' => 'p1',
-          'photo_prefix' => 'http://example.com',
-          'photo_suffix' => '1.png',
+          'photo-id' => 'p1',
+          'photo-prefix' => 'http://example.com',
+          'photo-suffix' => '1.png',
           'location' => ['address1', 'address 2'],
           'point' => [51.12, -0.083],
-          'foursquare_id' => 'id1'
+          'foursquare-id' => 'id1',
+          "type"=>"stops",
+          "links"=>{"self"=>"/api/v1/stops/#{stop1.id}"}
         },
         {
-          'id' => stop2.id,
-          'crawl_id' => crawl.id,
-          'row_order' => stop2.row_order,
+          'id' => stop2.id.to_s,
+          'crawl-id' => crawl.id,
+          'row-order' => stop2.row_order,
           'name' => 'stop 2',
-          'venue_name' => 'venue2',
+          'venue-name' => 'venue2',
           'description' => 'desc 2',
-          'photo_id' => 'p2',
-          'photo_prefix' => 'http://example.com',
-          'photo_suffix' => '2.png',
+          'photo-id' => 'p2',
+          'photo-prefix' => 'http://example.com',
+          'photo-suffix' => '2.png',
           'location' => ['address3', 'address 4', 'address 5'],
           'point' => [51.4951849624377, -0.0837063789367676],
-          'foursquare_id' => 'id2'
+          'foursquare-id' => 'id2',
+          "type"=>"stops",
+          "links"=>{"self"=>"/api/v1/stops/#{stop2.id}"}
         }
       ])
     end
@@ -104,9 +110,9 @@ RSpec.describe Api::V1::StopsController do
       } }, auth_header
       expect(response).to have_http_status(200)
       response_data = JSON.parse(response.body)
-      expect(response_data['stop']['name']).to eq('stop 1 updated')
-      expect(response_data['stop']['foursquare_id']).to eq('id47')
-      expect(response_data['stop']['row_order']).to be > stop2.row_order
+      expect(response_data['data']['name']).to eq('stop 1 updated')
+      expect(response_data['data']['foursquare-id']).to eq('id47')
+      expect(response_data['data']['row-order']).to be > stop2.row_order
     end
 
     it "update action can't set bad params" do
@@ -147,20 +153,22 @@ RSpec.describe Api::V1::StopsController do
   it 'index action returns empty array if no results' do
     get '/api/v1/stops?crawl_id=2'
     response_data = JSON.parse(response.body)
-    expect(response_data["stops"]).to be_empty
+    expect(response_data["data"]).to be_empty
   end
 
   context 'given an existing crawl' do
     def expected_stop(stop)
-      { 'stop' => {
-        'id' => stop.id, 'row_order' => stop.row_order, 'name' => 'foo',
-        'crawl_id' => stop.crawl_id,
-        'venue_name' => 'Club & Grill', 'description' => 'The best grill',
-        'photo_id' => 'blarg', 'photo_prefix' => 'http://foo.com',
-        'photo_suffix' => 'blarg.jpg',
+      { 'data' => {
+        'id' => stop.id.to_s, 'crawl-id' => stop.crawl_id,
+        'row-order' => stop.row_order, 'name' => 'foo',
+        'venue-name' => 'Club & Grill', 'description' => 'The best grill',
+        'photo-id' => 'blarg', 'photo-prefix' => 'http://foo.com',
+        'photo-suffix' => 'blarg.jpg',
         'location' => ['237 W 42nd St', 'New York, NY 10036', 'United States'],
         'point' => [51.4951849624377, -0.0837063789367676],
-        'foursquare_id' => '410c3280f964a520b20b1fe3'
+        'foursquare-id' => '410c3280f964a520b20b1fe3',
+        "type"=>"stops",
+        "links"=>{"self"=>"/api/v1/stops/#{stop.id}"}
       } }
     end
 
